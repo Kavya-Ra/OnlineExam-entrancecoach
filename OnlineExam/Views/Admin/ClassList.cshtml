@@ -1,0 +1,33 @@
+﻿@model IEnumerable<OnlineExam.ViewModel.ProgrammesViewModel>
+
+@{
+    ViewBag.Title = "ClassList";
+}
+
+<h2>ClassList</h2>
+
+<p>
+    @Html.ActionLink("Create New", "CreateClass")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Name)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "CreateClass", new { id = item.Id }) |
+                @Html.ActionLink("Delete", "DeleteClass", new { id = item.Id })
+            </td>
+        </tr>
+    }
+
+</table>

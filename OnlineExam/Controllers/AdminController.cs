@@ -1,4 +1,4 @@
-﻿using OnlineExam.Models;
+﻿ using OnlineExam.Models;
 using OnlineExam.ViewModel;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Web.Mvc;
 
 namespace OnlineExam.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     public class AdminController : Controller
     {
         private DB db = new DB();
@@ -70,7 +70,7 @@ namespace OnlineExam.Controllers
         public ActionResult AddUser()
         {
             RegisterViewModel model = new RegisterViewModel();
-            model.Roles = db.Roles.ToList();
+            model.Roles  = db.Roles.ToList();
             model.RoleId = 0;
             return View(model);
         }
@@ -116,7 +116,6 @@ namespace OnlineExam.Controllers
                 FirstName = model.FirstName,
                 LastName = model.LastName,
                 Password = model.Password,
-                UserId = userId,
                 CreatedDate = DateTime.Now,
                 RoleId = model.RoleId
             };
@@ -139,5 +138,165 @@ namespace OnlineExam.Controllers
 
             return View(model); ;
         }
+
+
+        public async Task<ActionResult> ProgrammeList()
+        {
+            
+            return View(await db.Programme.Where(p=> p.IsDeleted == 0).ToListAsync());
+        }
+
+        public async Task<ActionResult> CreateProgramme(int? id)
+        {
+            if(id == null)
+            {
+                return View();
+            }
+            else
+            {
+                var data = await db.Programme.Where(d => d.Id == id).FirstOrDefaultAsync();
+                ProgrammesViewModel viewModel = new ProgrammesViewModel()
+                { 
+                   Id = data.Id,
+                   Name = data.Name,
+                   CreatedBy = data.CreatedBy,
+                   CreatedDate = data.CreatedDate,
+                   IsDeleted = data.IsDeleted,
+                   ModifiedBy = data.ModifiedBy,
+                   ModifiedTime = data.ModifiedTime,
+                   DeletedDate = data.DeletedDate
+                };
+                return View(viewModel);
+            }
+            
+        }
+        
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> CreateProgramme(ProgrammesViewModel programmes)
+        {
+           
+
+            if (ModelState.IsValid)
+            {
+                Programmes model = new Programmes()
+                {
+                    Name = programmes.Name,
+                    //CreatedBy = 0,
+                    CreatedDate = DateTime.Now,
+                    ModifiedTime = DateTime.Now,
+                    DeletedDate = DateTime.Now
+                };
+              
+                db.Programme.Add(model);
+                await db.SaveChangesAsync();
+                ViewBag.StatusMessage = "Programme Created Succesfully.";
+                return RedirectToAction("ProgrammeList");
+            }
+            return View();
+        }
+
+     
+
+        public async Task<ActionResult> CreateSubProgram(int? id)
+        {
+            int pgmid = 0;
+            if (id == null)
+            {
+                SubProgramViewModel model = new SubProgramViewModel();
+                model.Programme = db.Programme.ToList();
+                model.PgmId = 0;
+                return View(model);
+            }
+            else
+            {
+                var data = await db.SubPrograms.Where(d => d.Id == id).FirstOrDefaultAsync();
+                SubProgramViewModel viewModel = new SubProgramViewModel()
+                {
+                    Id = data.Id,
+                    Name = data.Name,
+                    CreatedBy = data.CreatedBy,
+                    CreatedDate = data.CreatedDate,
+                    IsDeleted = data.IsDeleted,
+                    ModifiedBy = data.ModifiedBy,
+                    ModifiedTime = data.ModifiedTime,
+                    DeletedDate = data.DeletedDate,
+                    PgmId = data.PgmId     
+                };
+                pgmid = data.PgmId;
+                viewModel.Programme = db.Programme.ToList();
+                viewModel.PgmId = pgmid;
+                return View(viewModel);
+            }
+
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> CreateSubProgram(SubProgramViewModel subProgram)
+        {
+
+
+            if (ModelState.IsValid)
+            {
+                SubProgram model = new SubProgram()
+                {
+                    Name = subProgram.Name,
+                    CreatedDate = DateTime.Now,
+                    ModifiedTime = DateTime.Now,
+                    DeletedDate = DateTime.Now,
+                    PgmId = subProgram.PgmId
+                    
+                };
+
+                db.SubPrograms.Add(model);
+                await db.SaveChangesAsync();
+                ViewBag.StatusMessage = "SubProgram Created Succesfully.";
+                return RedirectToAction("SubProgramList");
+            }
+            return View();
+        }
+
+        public async Task<ActionResult> SubProgramList()
+        {
+
+            return View(await db.SubPrograms.Where(p => p.IsDeleted == 0).ToListAsync());
+        }
+
+        public ActionResult CreateClass()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> CreateClass(ClassViewModel classView)
+        {
+            if (ModelState.IsValid)
+            {
+                Class model = new Class()
+                {
+                    Name = classView.Name,
+                    CreatedDate = DateTime.Now,
+                    ModifiedTime = DateTime.Now,
+                    DeletedDate = DateTime.Now
+                };
+
+                db.Classes.Add(model);
+                await db.SaveChangesAsync();
+                ViewBag.StatusMessage = "Class Created Succesfully.";
+                return RedirectToAction("ClassList");
+            }
+            return View();
+        }
+
+        public async Task<ActionResult> ClassList()
+        {
+
+            return View(await db.Classes.Where(c => c.IsDeleted == 0).ToListAsync());
+        }
+
     }
 }

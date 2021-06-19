@@ -18,7 +18,7 @@
                 </button>
                 @Html.ActionLink("entrancecoach.com", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
             </div>
-            <div class="navbar-collapse collapse">                
+            <div class="navbar-collapse collapse">
                 @Html.Partial("_LoginPartial")
             </div>
         </div>
@@ -33,11 +33,11 @@
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
-    <script type="text/javascript">
+ <!--   <script type="text/javascript">
         function preventBack() { window.history.forward(); }
         setTimeout("preventBack()", 0);
         window.onunload = function () { null };
-    </script>
+    </script>  -->
     @RenderSection("scripts", required: false)
 </body>
 </html>
