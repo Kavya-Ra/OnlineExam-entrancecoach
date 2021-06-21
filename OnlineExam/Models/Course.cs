@@ -1,22 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
-using System.ComponentModel.DataAnnotations;
 
-namespace OnlineExam.ViewModel
+namespace OnlineExam.Models
 {
-    public class ClassViewModel
+    [Table("Course")]
+    public class Course
     {
-        [Required]
-        [Display(Name = "Name")]
+        [Key]
+        public int Id { get; set; }
         public string Name { get; set; }
-        public int? Id { get; set; }
         public int CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
         public int IsDeleted { get; set; }
         public DateTime DeletedDate { get; set; }
         public int ModifiedBy { get; set; }
         public DateTime ModifiedTime { get; set; }
+        public int ClassId { get; set; }
+
     }
 }

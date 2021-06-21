@@ -5,10 +5,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
 
+
 namespace OnlineExam.Models
 {
+
+    [Table("Class")]
     public class Class
     {
+
         [Key]
         public int Id { get; set; }
         public string Name { get; set; }

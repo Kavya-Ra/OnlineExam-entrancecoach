@@ -7,6 +7,8 @@ using System.Web;
 
 namespace OnlineExam.Models
 {
+
+    [Table("Programmes")]
     public class Programmes
     {
         [Key]

@@ -19,15 +19,24 @@
 
     @foreach (var item in Model)
     {
-<tr>
-    <td>
-        @Html.DisplayFor(modelItem => item.Name)
-    </td>
-    <td>
-        @Html.ActionLink("Edit", "CreateSubProgram", new { id = item.Id }) |
-        @Html.ActionLink("Delete", "DeleteSubProgram", new { id = item.Id })
-    </td>
-</tr>
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "CreateSubProgram", new { id = item.Id }) |
+                @Html.ActionLink("Delete", "DeleteSubProgram", new { id = item.Id })
+            </td>
+        </tr>
     }
 
 </table>
+
+
+@using (Html.BeginForm("DeleteSubProgram", "Admin", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <input type="hidden" id="id" name="id" value="1" />
+    <button type="submit">Delete</button>
+
+}

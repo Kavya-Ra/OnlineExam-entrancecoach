@@ -18,8 +18,8 @@ namespace OnlineExam.Models
 
         public DbSet<Class> Classes { get; set; }
 
-        public System.Data.Entity.DbSet<OnlineExam.ViewModel.ClassViewModel> ClassViewModels { get; set; }
+        public DbSet<Course> Courses { get; set; }
 
-        public System.Data.Entity.DbSet<OnlineExam.ViewModel.ProgrammesViewModel> ProgrammesViewModels { get; set; }
+        public System.Data.Entity.DbSet<OnlineExam.ViewModel.CourseViewModel> CourseViewModels { get; set; }
     }
 }

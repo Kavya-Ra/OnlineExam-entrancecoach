@@ -70,7 +70,7 @@ namespace OnlineExam.Controllers
         public ActionResult AddUser()
         {
             RegisterViewModel model = new RegisterViewModel();
-            model.Roles  = db.Roles.ToList();
+            model.Roles = db.Roles.ToList();
             model.RoleId = 0;
             return View(model);
         }
@@ -82,7 +82,7 @@ namespace OnlineExam.Controllers
         {
             string alpha = null;
 
-            if(model.RoleId == 1)
+            if (model.RoleId == 1)
             {
                 alpha = "ECA";
             }
@@ -142,13 +142,13 @@ namespace OnlineExam.Controllers
 
         public async Task<ActionResult> ProgrammeList()
         {
-            
-            return View(await db.Programme.Where(p=> p.IsDeleted == 0).ToListAsync());
+
+            return View(await db.Programme.Where(p => p.IsDeleted == 0).ToListAsync());
         }
 
         public async Task<ActionResult> CreateProgramme(int? id)
         {
-            if(id == null)
+            if (id == null)
             {
                 return View();
             }
@@ -156,52 +156,102 @@ namespace OnlineExam.Controllers
             {
                 var data = await db.Programme.Where(d => d.Id == id).FirstOrDefaultAsync();
                 ProgrammesViewModel viewModel = new ProgrammesViewModel()
-                { 
-                   Id = data.Id,
-                   Name = data.Name,
-                   CreatedBy = data.CreatedBy,
-                   CreatedDate = data.CreatedDate,
-                   IsDeleted = data.IsDeleted,
-                   ModifiedBy = data.ModifiedBy,
-                   ModifiedTime = data.ModifiedTime,
-                   DeletedDate = data.DeletedDate
+                {
+                    Id = data.Id,
+                    Name = data.Name,
+                    CreatedBy = data.CreatedBy,
+                    CreatedDate = data.CreatedDate,
+                    IsDeleted = data.IsDeleted,
+                    ModifiedBy = data.ModifiedBy,
+                    ModifiedTime = data.ModifiedTime,
+                    DeletedDate = data.DeletedDate
                 };
                 return View(viewModel);
             }
-            
+
         }
-        
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> CreateProgramme(ProgrammesViewModel programmes)
         {
-           
-
-            if (ModelState.IsValid)
+            if (programmes.Id != null)
             {
-                Programmes model = new Programmes()
+                if (ModelState.IsValid)
                 {
-                    Name = programmes.Name,
-                    //CreatedBy = 0,
-                    CreatedDate = DateTime.Now,
-                    ModifiedTime = DateTime.Now,
-                    DeletedDate = DateTime.Now
-                };
-              
-                db.Programme.Add(model);
-                await db.SaveChangesAsync();
-                ViewBag.StatusMessage = "Programme Created Succesfully.";
-                return RedirectToAction("ProgrammeList");
+                    Programmes model = new Programmes()
+                    {
+                        Id = (int)programmes.Id,
+                        Name = programmes.Name,
+                        CreatedBy = programmes.CreatedBy,
+                        CreatedDate = programmes.CreatedDate,
+                        IsDeleted = programmes.IsDeleted,
+                        ModifiedTime = DateTime.Now,
+                        ModifiedBy = 1,
+                        DeletedDate = programmes.DeletedDate,
+
+                    };
+
+                    db.Entry(model).State = EntityState.Modified;
+                    ViewBag.StatusMessage = "Programme Edited Succesfully.";
+                    await db.SaveChangesAsync();
+                    return RedirectToAction("ProgrammeList");
+                }
+
+                return View(programmes);
             }
-            return View();
+            else
+            {
+                if (ModelState.IsValid)
+                {
+                    Programmes model = new Programmes()
+                    {
+                        Name = programmes.Name,
+                        //CreatedBy = 0,
+                        CreatedDate = DateTime.Now,
+                        ModifiedTime = DateTime.Now,
+                        DeletedDate = DateTime.Now
+                    };
+
+                    db.Programme.Add(model);
+                    await db.SaveChangesAsync();
+                    ViewBag.StatusMessage = "Programme Created Succesfully.";
+                    return RedirectToAction("ProgrammeList");
+                }
+                return View();
+            }
         }
 
-     
+        public async Task<ActionResult> DeleteProgramme(int? id)
+        {
+            if (id == null)
+            {
+                ViewBag.StatusMessage = "Not Deleted..!";
+                return RedirectToAction("ProgrammeList");
+            }
+            else
+            {
+                Programmes programmes = await db.Programme.Where(c => c.Id == id).FirstOrDefaultAsync();
+
+                if (programmes != null)
+                {
+                    programmes.IsDeleted = 1;
+                    db.Entry(programmes).State = EntityState.Modified;
+                    await db.SaveChangesAsync();
+                    ViewBag.StatusMessage = "Programme Deleted Succesfully.";
+                    return RedirectToAction("ProgrammeList");
+                }
+                ViewBag.StatusMessage = "Not Deleted..!";
+                return RedirectToAction("ProgrammeList");
+            }
+
+
+        }
 
         public async Task<ActionResult> CreateSubProgram(int? id)
         {
-            int pgmid = 0;
+
             if (id == null)
             {
                 SubProgramViewModel model = new SubProgramViewModel();
@@ -222,11 +272,12 @@ namespace OnlineExam.Controllers
                     ModifiedBy = data.ModifiedBy,
                     ModifiedTime = data.ModifiedTime,
                     DeletedDate = data.DeletedDate,
-                    PgmId = data.PgmId     
+                    PgmId = data.PgmId,
+                    Programme = db.Programme.ToList()
                 };
-                pgmid = data.PgmId;
-                viewModel.Programme = db.Programme.ToList();
-                viewModel.PgmId = pgmid;
+                //pgmid = data.PgmId;
+                //viewModel.Programme = db.Programme.ToList();
+                //viewModel.PgmId = pgmid;
                 return View(viewModel);
             }
 
@@ -237,26 +288,52 @@ namespace OnlineExam.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> CreateSubProgram(SubProgramViewModel subProgram)
         {
-
-
-            if (ModelState.IsValid)
+            if (subProgram.Id != null)
             {
-                SubProgram model = new SubProgram()
+                if (ModelState.IsValid)
                 {
-                    Name = subProgram.Name,
-                    CreatedDate = DateTime.Now,
-                    ModifiedTime = DateTime.Now,
-                    DeletedDate = DateTime.Now,
-                    PgmId = subProgram.PgmId
-                    
-                };
+                    SubProgram model = new SubProgram()
+                    {
+                        Id = (int)subProgram.Id,
+                        Name = subProgram.Name,
+                        CreatedBy = subProgram.CreatedBy,
+                        CreatedDate = subProgram.CreatedDate,
+                        IsDeleted = subProgram.IsDeleted,
+                        ModifiedTime = DateTime.Now,
+                        ModifiedBy = 1,
+                        DeletedDate = subProgram.DeletedDate,
 
-                db.SubPrograms.Add(model);
-                await db.SaveChangesAsync();
-                ViewBag.StatusMessage = "SubProgram Created Succesfully.";
-                return RedirectToAction("SubProgramList");
+                    };
+
+                    db.Entry(model).State = EntityState.Modified;
+                    ViewBag.StatusMessage = "SubProgram Edited Succesfully.";
+                    await db.SaveChangesAsync();
+                    return RedirectToAction("SubProgramList");
+                }
+
+                return View(subProgram);
             }
-            return View();
+            else
+            {
+                if (ModelState.IsValid)
+                {
+                    SubProgram model = new SubProgram()
+                    {
+                        Name = subProgram.Name,
+                        CreatedDate = DateTime.Now,
+                        ModifiedTime = DateTime.Now,
+                        DeletedDate = DateTime.Now,
+                        PgmId = subProgram.PgmId
+
+                    };
+
+                    db.SubPrograms.Add(model);
+                    await db.SaveChangesAsync();
+                    ViewBag.StatusMessage = "SubProgram Created Succesfully.";
+                    return RedirectToAction("SubProgramList");
+                }
+                return View();
+            }
         }
 
         public async Task<ActionResult> SubProgramList()
@@ -265,38 +342,263 @@ namespace OnlineExam.Controllers
             return View(await db.SubPrograms.Where(p => p.IsDeleted == 0).ToListAsync());
         }
 
-        public ActionResult CreateClass()
+        public async Task<ActionResult> DeleteSubProgram(int? id)
         {
-            return View();
+            if (id == null)
+            {
+                ViewBag.StatusMessage = "Not Deleted..!";
+                return RedirectToAction("SubProgramList");
+            }
+            else
+            {
+                SubProgram subProgram = await db.SubPrograms.Where(c => c.Id == id).FirstOrDefaultAsync();
+
+                if (subProgram != null)
+                {
+                    subProgram.IsDeleted = 1;
+                    db.Entry(subProgram).State = EntityState.Modified;
+                    await db.SaveChangesAsync();
+                    ViewBag.StatusMessage = "SubProgram Deleted Succesfully.";
+                    return RedirectToAction("SubProgramList");
+                }
+                ViewBag.StatusMessage = "Not Deleted..!";
+                return RedirectToAction("SubProgramList");
+            }
+
+
+        }
+
+        public async Task<ActionResult> CreateClass(int? id)
+        {
+            if (id == null)
+            {
+                return View();
+            }
+            else
+            {
+                var data = await db.Classes.Where(c => c.Id == id).FirstOrDefaultAsync();
+                ClassViewModel viewModel = new ClassViewModel()
+                {
+                    Id = data.Id,
+                    Name = data.Name,
+                    CreatedBy = data.CreatedBy,
+                    CreatedDate = data.CreatedDate,
+                    IsDeleted = data.IsDeleted,
+                    ModifiedBy = data.ModifiedBy,
+                    ModifiedTime = data.ModifiedTime,
+                    DeletedDate = data.DeletedDate
+                };
+                return View(viewModel);
+            }
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> CreateClass(ClassViewModel classView)
         {
-            if (ModelState.IsValid)
+            if (classView.Id != null)
             {
-                Class model = new Class()
+                if (ModelState.IsValid)
                 {
-                    Name = classView.Name,
-                    CreatedDate = DateTime.Now,
-                    ModifiedTime = DateTime.Now,
-                    DeletedDate = DateTime.Now
-                };
+                    Class model = new Class()
+                    {
+                        Id = (int)classView.Id,
+                        Name = classView.Name,
+                        CreatedBy = classView.CreatedBy,
+                        CreatedDate = classView.CreatedDate,
+                        IsDeleted = classView.IsDeleted,
+                        ModifiedTime = DateTime.Now,
+                        ModifiedBy = 1,
+                        DeletedDate = classView.DeletedDate,
 
-                db.Classes.Add(model);
-                await db.SaveChangesAsync();
-                ViewBag.StatusMessage = "Class Created Succesfully.";
-                return RedirectToAction("ClassList");
+                    };
+
+                    db.Entry(model).State = EntityState.Modified;
+                    ViewBag.StatusMessage = "Class Edited Succesfully.";
+                    await db.SaveChangesAsync();
+                    return RedirectToAction("ClassList");
+                }
+
+                return View(classView);
+
             }
-            return View();
+            else
+            {
+                if (ModelState.IsValid)
+                {
+                    Class model = new Class()
+                    {
+                        Name = classView.Name,
+                        CreatedDate = DateTime.Now,
+                        ModifiedTime = DateTime.Now,
+                        DeletedDate = DateTime.Now
+                    };
+
+                    db.Classes.Add(model);
+                    await db.SaveChangesAsync();
+                    ViewBag.StatusMessage = "Class Created Succesfully.";
+                    return RedirectToAction("ClassList");
+                }
+                return View();
+            }
+
+
+
+
         }
 
         public async Task<ActionResult> ClassList()
         {
-
             return View(await db.Classes.Where(c => c.IsDeleted == 0).ToListAsync());
         }
 
+
+        public async Task<ActionResult> DeleteClass(int? id)
+        {
+            if (id == null)
+            {
+                ViewBag.StatusMessage = "Not Deleted..!";
+                return RedirectToAction("ClassList");
+            }
+            else
+            {
+                Class classes = await db.Classes.Where(c => c.Id == id).FirstOrDefaultAsync();
+
+                if (classes != null)
+                {
+                    classes.IsDeleted = 1;
+                    db.Entry(classes).State = EntityState.Modified;
+                    await db.SaveChangesAsync();
+                    ViewBag.StatusMessage = "Class Deleted Succesfully.";
+                    return RedirectToAction("ClassList");
+                }
+                ViewBag.StatusMessage = "Not Deleted..!";
+                return RedirectToAction("ClassList");
+            }
+
+
+        }
+
+        public async Task<ActionResult> CreateCourse(int? id)
+        {
+            if (id == null)
+            {
+                CourseViewModel model = new CourseViewModel();
+                model.Classes = db.Classes.ToList();
+                model.ClassId = 0;
+                return View(model);
+            }
+            else
+            {
+                var data = await db.Courses.Where(d => d.Id == id).FirstOrDefaultAsync();
+                CourseViewModel course = new CourseViewModel()
+                {
+                    Id = data.Id,
+                    Name = data.Name,
+                    CreatedBy = data.CreatedBy,
+                    CreatedDate = data.CreatedDate,
+                    IsDeleted = data.IsDeleted,
+                    ModifiedBy = data.ModifiedBy,
+                    ModifiedTime = data.ModifiedTime,
+                    DeletedDate = data.DeletedDate,
+                    ClassId = data.ClassId,
+                    Classes = db.Classes.ToList()
+                };
+                /* viewModel.Classes = db.Classes.ToList();
+                 viewModel.ClassId = classId;*/
+                return View(course);
+            }
+
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> CreateCourse(CourseViewModel course)
+        {
+
+            if (course.Id != null)
+            {
+                if (ModelState.IsValid)
+                {
+                    Course model = new Course()
+                    {
+                        Id = (int)course.Id,
+                        Name = course.Name,
+                        CreatedBy = course.CreatedBy,
+                        CreatedDate = course.CreatedDate,
+                        IsDeleted = course.IsDeleted,
+                        ModifiedTime = DateTime.Now,
+                        ModifiedBy = 1,
+                        DeletedDate = course.DeletedDate,
+                        ClassId = course.ClassId
+
+                    };
+
+                    db.Entry(model).State = EntityState.Modified;
+                    await db.SaveChangesAsync();
+                    ViewBag.StatusMessage = "Course Edited Succesfully.";
+                    return RedirectToAction("CourseList");
+                }
+
+                return View(course);
+            }
+            else
+            {
+                if (ModelState.IsValid)
+                {
+                    Course model = new Course()
+                    {
+                        Name = course.Name,
+                        CreatedDate = DateTime.Now,
+                        ModifiedTime = DateTime.Now,
+                        DeletedDate = DateTime.Now,
+                        ClassId = course.ClassId
+
+                    };
+
+                    db.Courses.Add(model);
+                    await db.SaveChangesAsync();
+                    ViewBag.StatusMessage = "Course Created Succesfully.";
+                    return RedirectToAction("CourseList");
+                }
+                return View();
+            }
+
+        }
+
+        public async Task<ActionResult> CourseList()
+        {
+
+            return View(await db.Courses.Where(p => p.IsDeleted == 0).ToListAsync());
+        }
+
+        /*[HttpPost]
+        [ValidateAntiForgeryToken]*/
+        public async Task<ActionResult> DeleteCourse(int? id)
+        {
+            if (id == null)
+            {
+                ViewBag.StatusMessage = "Not Deleted..!";
+                return RedirectToAction("CourseList");
+            }
+            else
+            {
+                Course course = await db.Courses.Where(c => c.Id == id).FirstOrDefaultAsync();
+
+                if(course != null)
+                {
+                    course.IsDeleted = 1;
+                    db.Entry(course).State = EntityState.Modified;
+                    await db.SaveChangesAsync();
+                    ViewBag.StatusMessage = "Course Deleted Succesfully.";
+                    return RedirectToAction("CourseList");
+                }
+                ViewBag.StatusMessage = "Not Deleted..!";
+                return RedirectToAction("CourseList");
+            }
+
+
+        }
     }
 }

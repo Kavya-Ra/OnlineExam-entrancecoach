@@ -13,7 +13,7 @@ namespace OnlineExam.ViewModel
         [Required]
         [Display(Name = "Name")]
         public string Name { get; set; }
-        public int Id { get; set; }
+        public int? Id { get; set; }
         public int CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
         public int IsDeleted { get; set; }

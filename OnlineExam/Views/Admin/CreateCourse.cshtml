@@ -1,17 +1,17 @@
-﻿@model OnlineExam.ViewModel.ProgrammesViewModel
+﻿@model OnlineExam.ViewModel.CourseViewModel
 
 @{
-    ViewBag.Title = "CreateProgramme";
+    ViewBag.Title = "CreateCourse";
 }
 
-<h2>CreateProgramme</h2>
+<h2>CreateCourse</h2>
 
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
 
 <div class="form-horizontal">
-    <h4>ProgrammesViewModel</h4>
+    <h4>CourseViewModel</h4>
     <hr />
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
     <div class="form-group">
@@ -21,6 +21,15 @@
             @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
         </div>
     </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.ClassId, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownListFor(model => model.ClassId, new SelectList(Model.Classes, "Id", "Name"), "--- Select Class ---", new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.ClassId, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
     @Html.HiddenFor(model => model.Id)
     @Html.HiddenFor(model => model.CreatedBy)
     @Html.HiddenFor(model => model.CreatedDate)
@@ -28,6 +37,7 @@
     @Html.HiddenFor(model => model.DeletedDate)
     @Html.HiddenFor(model => model.ModifiedBy)
     @Html.HiddenFor(model => model.ModifiedTime)
+
     <div class="form-group">
         <div class="col-md-offset-2 col-md-10">
             <input type="submit" value="Create" class="btn btn-default" />
@@ -40,6 +50,8 @@
     @Html.ActionLink("Back to List", "Index")
 </div>
 
+
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
 }
+

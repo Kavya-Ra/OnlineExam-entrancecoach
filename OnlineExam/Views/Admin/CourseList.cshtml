@@ -1,0 +1,45 @@
+﻿@model IEnumerable<OnlineExam.Models.Course>
+
+@{
+    ViewBag.Title = "CourseList";
+}
+
+<h2>CourseList</h2>
+
+<p>
+    @Html.ActionLink("Create New", "CreateCourse")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Name)
+        </th>
+
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+
+            <td>
+                @Html.ActionLink("Edit", "CreateCourse", new { id = item.Id }) |
+                @Html.ActionLink("Delete", "DeleteCourse", new { id = item.Id })
+            </td>
+        </tr>
+    }
+
+</table>
+
+
+
+    @using (Html.BeginForm("DeleteCourse", "Admin", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()     
+        <input type="hidden" id="id" name="id" value="1" />
+        <button type="submit">Delete</button>
+        
+    }

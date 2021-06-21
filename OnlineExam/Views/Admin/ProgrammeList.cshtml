@@ -37,3 +37,11 @@
     }
 
 </table>
+
+@using (Html.BeginForm("DeleteProgramme", "Admin", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <input type="hidden" id="id" name="id" value="1" />
+    <button type="submit">Delete</button>
+
+}
