@@ -1,0 +1,90 @@
+﻿@model OnlineExam.ViewModel.ChapterViewModel
+
+@{
+    ViewBag.Title = "Chapters";
+}
+
+<h2>Chapters</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>ChapterViewModel</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.SubId, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.SubId, new SelectList(Model.Subjects, "Id", "Name"), "--- Select Subjects ---", new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.SubId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        @Html.HiddenFor(model => model.Id)
+        @Html.HiddenFor(model => model.CreatedBy)
+        @Html.HiddenFor(model => model.CreatedDate)
+        @Html.HiddenFor(model => model.IsDeleted)
+        @Html.HiddenFor(model => model.DeletedDate)
+        @Html.HiddenFor(model => model.ModifiedBy)
+        @Html.HiddenFor(model => model.ModifiedTime)
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+<table class="table">
+    <tr>
+        <th>Sl.No</th>
+        <th>
+            Subject Name
+        </th>
+        <th>Action</th>
+    </tr>
+    @{
+        int counter = 1;
+    }
+    @foreach (var item in Model.Chapters)
+    {
+        int sl = counter++;
+        <tr>
+            <td>@sl</td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Chapters", new { id = item.Id }) |
+                @Html.ActionLink("Delete", "DeleteChapters", new { id = item.Id })
+            </td>
+        </tr>
+    }
+
+</table>
+
+@using (Html.BeginForm("DeleteChapters", "Admin", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <input type="hidden" id="id" name="id" value="1" />
+    <button type="submit">Delete</button>
+
+}
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+

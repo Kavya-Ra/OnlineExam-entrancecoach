@@ -600,5 +600,264 @@ namespace OnlineExam.Controllers
 
 
         }
+
+        public async Task<ActionResult> Subjects(int? id)
+        {
+
+
+            if (id == null)
+            {
+                SubjectViewModel viewModel = new SubjectViewModel()
+                {
+                    Subjects = await db.Subjects.Where(p => p.IsDeleted == 0).ToListAsync()
+                };
+
+                return View(viewModel);
+
+            }
+            else
+            {
+                var data = await db.Subjects.Where(d => d.Id == id).FirstOrDefaultAsync();
+                SubjectViewModel course = new SubjectViewModel()
+                {
+                    Id = data.Id,
+                    Name = data.Name,
+                    CreatedBy = data.CreatedBy,
+                    CreatedDate = data.CreatedDate,
+                    IsDeleted = data.IsDeleted,
+                    ModifiedBy = data.ModifiedBy,
+                    ModifiedTime = data.ModifiedTime,
+                    DeletedDate = data.DeletedDate,
+                    Subjects = await db.Subjects.Where(p => p.IsDeleted == 0).ToListAsync()
+                };
+             
+                return View(course);
+            }
+
+          
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Subjects(SubjectViewModel viewModel)
+        {
+
+
+            if (viewModel.Id != null)
+            {
+                if (ModelState.IsValid)
+                {
+                    Subject model = new Subject()
+                    {
+                        Id = (int)viewModel.Id,
+                        Name = viewModel.Name,
+                        CreatedBy = viewModel.CreatedBy,
+                        CreatedDate = viewModel.CreatedDate,
+                        IsDeleted = viewModel.IsDeleted,
+                        ModifiedTime = DateTime.Now,
+                        ModifiedBy = 1,
+                        DeletedDate = viewModel.DeletedDate
+                    };
+
+                    db.Entry(model).State = EntityState.Modified;
+                    await db.SaveChangesAsync();
+                    ViewBag.StatusMessage = "Subject Edited Succesfully.";
+
+                    viewModel.Subjects = await db.Subjects.ToListAsync();
+                    return View(viewModel);
+                }
+
+                return RedirectToAction("Subjects");
+            }
+            else 
+            {
+                if (ModelState.IsValid)
+                {
+                    Subject model = new Subject()
+                    {
+                        Name = viewModel.Name,
+                        CreatedDate = DateTime.Now,
+                        ModifiedTime = DateTime.Now,
+                        DeletedDate = DateTime.Now,
+
+                    };
+
+                    db.Subjects.Add(model);
+                    await db.SaveChangesAsync();
+                    ViewBag.StatusMessage = "Subject Created Succesfully.";
+
+                    viewModel.Subjects = await db.Subjects.ToListAsync();
+                    return View(viewModel);
+                }
+                return RedirectToAction("Subjects");
+            }
+          
+           
+        }
+
+        public async Task<ActionResult> DeleteSubjects(int? id)
+        {
+            if (id == null)
+            {
+                ViewBag.StatusMessage = "Not Deleted..!";
+                return RedirectToAction("Subjects");
+            }
+            else
+            {
+                Subject subject = await db.Subjects.Where(c => c.Id == id).FirstOrDefaultAsync();
+
+                if (subject != null)
+                {
+                    subject.IsDeleted = 1;
+                    db.Entry(subject).State = EntityState.Modified;
+                    await db.SaveChangesAsync();
+
+                    ViewBag.StatusMessage = "Subjects Deleted Succesfully.";
+                    return RedirectToAction("Subjects");
+
+                }
+                ViewBag.StatusMessage = "Not Deleted..!";
+                return RedirectToAction("Subjects");
+
+
+            }
+
+        }
+
+        public async Task<ActionResult> Chapters(int? id)
+        {
+            if (id == null)
+            {
+
+                ChapterViewModel viewModel = new ChapterViewModel()
+                {
+                  
+                    Chapters = await db.Chapters.Where(p => p.IsDeleted == 0).ToListAsync()
+                   
+                };
+                viewModel.Subjects = db.Subjects.ToList();
+                viewModel.SubId = 0;
+
+               return View(viewModel);
+
+            }
+            else
+            {
+                var data = await db.Chapters.Where(d => d.Id == id).FirstOrDefaultAsync();
+                ChapterViewModel chapter = new ChapterViewModel()
+                {
+                    Id = data.Id,
+                    Name = data.Name,
+                    CreatedBy = data.CreatedBy,
+                    CreatedDate = data.CreatedDate,
+                    IsDeleted = data.IsDeleted,
+                    ModifiedBy = data.ModifiedBy,
+                    ModifiedTime = data.ModifiedTime,
+                    DeletedDate = data.DeletedDate,
+                    SubId = data.SubId,
+                    Subjects = db.Subjects.ToList(),
+                    Chapters = await db.Chapters.Where(p => p.IsDeleted == 0).ToListAsync()
+                };
+
+                return View(chapter);
+            }
+
+
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Chapters(ChapterViewModel viewModel)
+        {
+
+
+            if (viewModel.Id != null)
+            {
+                if (ModelState.IsValid)
+                {
+                    Chapter model = new Chapter()
+                    {
+                        Id = (int)viewModel.Id,
+                        Name = viewModel.Name,
+                        CreatedBy = viewModel.CreatedBy,
+                        CreatedDate = viewModel.CreatedDate,
+                        IsDeleted = viewModel.IsDeleted,
+                        ModifiedTime = DateTime.Now,
+                        ModifiedBy = 1,
+                        DeletedDate = viewModel.DeletedDate,
+                        SubId = viewModel.SubId
+                    };
+
+                    db.Entry(model).State = EntityState.Modified;
+                    await db.SaveChangesAsync();
+                    ViewBag.StatusMessage = "Chapters Edited Succesfully.";
+                    viewModel.Subjects = db.Subjects.ToList();
+                    viewModel.Chapters = await db.Chapters.ToListAsync();
+                    return View(viewModel);
+                }
+
+                return RedirectToAction("Chapters");
+            }
+            else
+            {
+                if (ModelState.IsValid)
+                {
+                    Chapter model = new Chapter()
+                    {
+                        Name = viewModel.Name,
+                        CreatedDate = DateTime.Now,
+                        ModifiedTime = DateTime.Now,
+                        DeletedDate = DateTime.Now,
+                        SubId = viewModel.SubId
+
+                    };
+
+                    db.Chapters.Add(model);
+                    await db.SaveChangesAsync();
+                    ViewBag.StatusMessage = "Chapters Created Succesfully.";
+                    viewModel.Subjects = db.Subjects.ToList();
+                    viewModel.Chapters = await db.Chapters.ToListAsync();
+                    return View(viewModel);
+                }
+                return RedirectToAction("Chapters");
+            }
+
+
+        }
+
+        public async Task<ActionResult> DeleteChapters(int? id)
+        {
+            if (id == null)
+            {
+                ViewBag.StatusMessage = "Not Deleted..!";
+                return RedirectToAction("Chapters");
+            }
+            else
+            {
+                Chapter chapter = await db.Chapters.Where(c => c.Id == id).FirstOrDefaultAsync();
+
+                if (chapter != null)
+                {
+                    chapter.IsDeleted = 1;
+                    db.Entry(chapter).State = EntityState.Modified;
+                    await db.SaveChangesAsync();
+                    
+                    ViewBag.StatusMessage = "Chapters Deleted Succesfully.";
+                    return RedirectToAction("Chapters");
+
+                }
+                ViewBag.StatusMessage = "Not Deleted..!";
+                return RedirectToAction("Chapters");
+
+             
+            }
+
+
+        }
+
+     
+
     }
 }

@@ -20,6 +20,9 @@ namespace OnlineExam.Models
 
         public DbSet<Course> Courses { get; set; }
 
-        public System.Data.Entity.DbSet<OnlineExam.ViewModel.CourseViewModel> CourseViewModels { get; set; }
+        public DbSet<Subject> Subjects { get; set; }
+
+        public DbSet<Chapter> Chapters { get; set; }
+
     }
 }
